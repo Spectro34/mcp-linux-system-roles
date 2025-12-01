@@ -98,18 +98,18 @@ sudo cat /etc/crontab | grep aide
 
 ---
 
-#### Example 2: Configure Firewall
+#### Example 2: Configure Cockpit
 
 **User**:
 ```
-configure firewall to allow ssh
+enable cockpit web console on port 9090
 ```
 
-**Model** (reads firewall documentation):
+**Model** (reads cockpit documentation):
 ```
-To allow SSH through the firewall, I will use:
-• firewall_zone: "public"
-• firewall_service: "ssh"
+To enable the Cockpit web console, I will use:
+• cockpit_enabled: true
+• cockpit_port: 9090
 
 Shall I proceed?
 ```
@@ -121,12 +121,42 @@ yes
 
 **Model** (executes):
 ```
-Firewall configured successfully. SSH is now allowed in the public zone.
+Cockpit web console configured successfully. Access at https://localhost:9090
 ```
 
 ---
 
-#### Example 3: Configure SSH Server
+#### Example 3: Configure Journald
+
+**User**:
+```
+set journal max file size to 100M and keep 7 days of logs
+```
+
+**Model** (reads journald documentation):
+```
+To configure journal size and retention, I will use:
+• journald_system_max_use: "1G"
+• journald_system_keep_free: "2G" 
+• journald_max_file_sec: "1day"
+• journald_max_retention_sec: "7day"
+
+Shall I proceed?
+```
+
+**User**:
+```
+yes
+```
+
+**Model** (executes):
+```
+Journald configured successfully. Logs will be kept for 7 days with appropriate size limits.
+```
+
+---
+
+#### Example 4: Configure SSH Server
 
 **User**:
 ```
@@ -159,26 +189,26 @@ You can explicitly ask the model to show you a role's documentation:
 
 **User**:
 ```
-show me the documentation for the firewall role
+show me the documentation for the cockpit role
 ```
 
-**Model** (calls `get_role_documentation("firewall")`):
+**Model** (calls `get_role_documentation("cockpit")`):
 ```
-[Displays firewall role README]
+[Displays cockpit role README]
 
-# Firewall Role
+# Cockpit Role
 
-This role configures the firewall using firewalld.
+This role installs and configures Cockpit web console.
 
 ## Variables
 
-### firewall_zone
-Zone to configure (e.g., "public", "internal")
-Type: string
+### cockpit_enabled
+Whether to enable and start cockpit.socket
+Type: bool
 
-### firewall_service  
-Service to allow (e.g., "ssh", "http", "https")
-Type: string
+### cockpit_port
+Port for the web console (default: 9090)
+Type: int
 
 [... full documentation ...]
 ```
@@ -360,25 +390,28 @@ Model: [Executes]
 
 ---
 
-### Session 2: Firewall Configuration
+### Session 2: Cockpit and Journald Configuration
 
 ```
 You: list available roles
 
 Model: [Shows 17 roles]
 
-You: configure firewall to allow http and https
+You: enable cockpit and configure journald to keep logs for 30 days
 
-Model: [Reads firewall docs]
-       I will use:
-       • firewall_zone: "public"
-       • firewall_service: ["http", "https"]
+Model: [Reads cockpit docs]
+       I'll configure two roles:
+       
+       1. Cockpit: cockpit_enabled=true, cockpit_port=9090
+       2. Journald: journald_max_retention_sec="30day"
+       
        Shall I proceed?
 
 You: yes
 
-Model: [Executes]
-       Firewall configured. HTTP and HTTPS now allowed.
+Model: [Executes both roles]
+       Cockpit enabled at https://localhost:9090
+       Journald configured with 30-day retention.
 ```
 
 ---

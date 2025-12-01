@@ -180,10 +180,10 @@ Before suggesting variables for ANY role, you MUST:
 
 **Example**:
 ```markdown
-User: "configure firewall to allow ssh"
-You: Call get_role_documentation(role_name="firewall")
+User: "enable cockpit web console"
+You: Call get_role_documentation(role_name="cockpit")
 You: Read variables, then suggest
-You: "I will use firewall_zone: public. Shall I proceed?"
+You: "I will enable cockpit on port 9090. Shall I proceed?"
 User: "yes"
 You: Call run_system_role(...)
 ```

@@ -114,13 +114,13 @@ You: yes
 Model: [Executes playbook, shows results]
 ```
 
-**Configure Firewall:**
+**Configure Cockpit:**
 ```
-You: allow ssh through firewall
-Model: [Reads firewall documentation]
-Model: I will use firewall settings to allow SSH. Shall I proceed?
+You: enable cockpit web console
+Model: [Reads cockpit documentation]
+Model: I will enable cockpit on port 9090. Shall I proceed?
 You: yes
-Model: [Configures firewall]
+Model: [Configures cockpit]
 ```
 
 ## File Structure
