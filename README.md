@@ -206,6 +206,10 @@ Model calls `run_system_role` → Approver logs it → Ansible executes → Resu
 - System roles add to `/etc/crontab`, not user crontab
 - Check with: `sudo cat /etc/crontab`
 
+### Demo
+
+Run `asciinema play demo.cast` to start demo
+
 ## License
 
 Apache 2.0
