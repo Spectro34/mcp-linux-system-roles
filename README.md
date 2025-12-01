@@ -187,6 +187,9 @@ Model calls `run_system_role` → Approver logs it → Ansible executes → Resu
 16. systemd - Systemd configuration
 17. timesync - Time synchronization
 
+## Demo
+Run `asciinema play demo.cast` to start demo ensure asciinema is installed.
+
 ## Troubleshooting
 
 ### Model outputs JSON instead of calling tool
@@ -205,10 +208,6 @@ Model calls `run_system_role` → Approver logs it → Ansible executes → Resu
 ### Cron jobs not visible
 - System roles add to `/etc/crontab`, not user crontab
 - Check with: `sudo cat /etc/crontab`
-
-### Demo
-
-Run `asciinema play demo.cast` to start demo
 
 ## License
 
