@@ -1,0 +1,238 @@
+---
+# Quick Setup Playbook for MCP Linux System Roles Server
+# This playbook sets up the MCP server on a fresh machine
+#
+# Usage:
+#   ansible-playbook -i localhost, -c local setup.yml
+#
+# Or with custom variables:
+#   ansible-playbook -i localhost, -c local setup.yml -e "install_dir=/opt/mcp-linux-system-roles"
+
+- name: Setup MCP Linux System Roles Server
+  hosts: localhost
+  connection: local
+  become: false
+  
+  vars:
+    # Where to install the MCP server (default: user's home)
+    install_dir: "{{ ansible_env.HOME }}/mcp-linux-system-roles"
+    # Package directory (where this playbook is located)
+    package_dir: "{{ playbook_dir }}"
+    # mcphost config directory
+    mcphost_config_dir: "{{ ansible_env.HOME }}/.config/mcphost/.mcphost"
+    # Ollama model to use
+    ollama_model: "gpt-oss:20b"
+
+  tasks:
+    - name: Display setup information
+      ansible.builtin.debug:
+        msg:
+          - "Setting up MCP Linux System Roles Server"
+          - "Installation directory: {{ install_dir }}"
+          - "Package directory: {{ package_dir }}"
+          - "User: {{ ansible_env.USER }}"
+
+    # Check prerequisites
+    - name: Check if running on SUSE/openSUSE
+      ansible.builtin.stat:
+        path: /etc/os-release
+      register: os_release
+
+    - name: Read OS info
+      ansible.builtin.slurp:
+        src: /etc/os-release
+      register: os_info_encoded
+
+    - name: Set OS facts
+      ansible.builtin.set_fact:
+        os_info: "{{ os_info_encoded.content | b64decode }}"
+
+    - name: Check SUSE Linux System Roles installation
+      ansible.builtin.stat:
+        path: /usr/share/ansible/collections/ansible_collections/suse/linux_system_roles
+      register: suse_roles
+
+    - name: Fail if SUSE roles not found
+      ansible.builtin.fail:
+        msg: |
+          SUSE Linux System Roles not found!
+          For openSUSE/SLES, they should be pre-installed.
+          If missing, install with: sudo zypper install ansible-collection-suse-suse_roles
+      when: not suse_roles.stat.exists
+
+    - name: Check for Ollama
+      ansible.builtin.command: which ollama
+      register: ollama_check
+      changed_when: false
+      failed_when: false
+
+    - name: Warn if Ollama not found
+      ansible.builtin.debug:
+        msg:
+          - "WARNING: Ollama not found in PATH"
+          - "Install Ollama: curl -fsSL https://ollama.com/install.sh | sh"
+          - "Then pull model: ollama pull {{ ollama_model }}"
+      when: ollama_check.rc != 0
+
+    - name: Check for mcphost
+      ansible.builtin.command: which mcphost
+      register: mcphost_check
+      changed_when: false
+      failed_when: false
+
+    - name: Warn if mcphost not found
+      ansible.builtin.debug:
+        msg:
+          - "WARNING: mcphost not found in PATH"
+          - "Install mcphost from: https://github.com/wong2/mcphost"
+      when: mcphost_check.rc != 0
+
+    # Copy MCP server files
+    - name: Create installation directory
+      ansible.builtin.file:
+        path: "{{ install_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Create server subdirectory
+      ansible.builtin.file:
+        path: "{{ install_dir }}/server"
+        state: directory
+        mode: '0755'
+
+    - name: Create docs subdirectory
+      ansible.builtin.file:
+        path: "{{ install_dir }}/docs"
+        state: directory
+        mode: '0755'
+
+    - name: Copy server.py
+      ansible.builtin.copy:
+        src: "{{ package_dir }}/server/server.py"
+        dest: "{{ install_dir }}/server/server.py"
+        mode: '0755'
+
+    - name: Copy universal_approver.py
+      ansible.builtin.copy:
+        src: "{{ package_dir }}/universal_approver.py"
+        dest: "{{ install_dir }}/universal_approver.py"
+        mode: '0755'
+
+    - name: Copy system-prompt.md
+      ansible.builtin.copy:
+        src: "{{ package_dir }}/system-prompt.md"
+        dest: "{{ install_dir }}/system-prompt.md"
+        mode: '0644'
+
+    - name: Copy documentation files
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ install_dir }}/docs/"
+        mode: '0644'
+      loop:
+        - "{{ package_dir }}/docs/architecture.md"
+        - "{{ package_dir }}/docs/setup.md"
+        - "{{ package_dir }}/docs/usage.md"
+
+    - name: Copy README
+      ansible.builtin.copy:
+        src: "{{ package_dir }}/README.md"
+        dest: "{{ install_dir }}/README.md"
+        mode: '0644'
+
+    # Setup mcphost configuration
+    - name: Create mcphost config directory
+      ansible.builtin.file:
+        path: "{{ mcphost_config_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Create .mcphost.yml
+      ansible.builtin.template:
+        src: "{{ package_dir }}/.mcphost.yml.example"
+        dest: "{{ ansible_env.HOME }}/.mcphost.yml"
+        mode: '0644'
+      vars:
+        server_path: "{{ install_dir }}/server/server.py"
+        prompt_path: "{{ install_dir }}/system-prompt.md"
+
+    - name: Process .mcphost.yml template
+      ansible.builtin.replace:
+        path: "{{ ansible_env.HOME }}/.mcphost.yml"
+        regexp: '<ABSOLUTE_PATH>'
+        replace: "{{ install_dir }}"
+
+    - name: Create hooks.yml from template
+      ansible.builtin.template:
+        src: "{{ package_dir }}/.mcphost/hooks.yml"
+        dest: "{{ mcphost_config_dir }}/hooks.yml"
+        mode: '0644'
+
+    - name: Process hooks.yml template
+      ansible.builtin.replace:
+        path: "{{ mcphost_config_dir }}/hooks.yml"
+        regexp: '<ABSOLUTE_PATH>'
+        replace: "{{ install_dir }}"
+
+    # Verify installation
+    - name: Verify server.py is executable
+      ansible.builtin.stat:
+        path: "{{ install_dir }}/server/server.py"
+      register: server_stat
+
+    - name: Fail if server not executable
+      ansible.builtin.fail:
+        msg: "server.py is not executable"
+      when: not server_stat.stat.executable
+
+    - name: Verify universal_approver.py is executable
+      ansible.builtin.stat:
+        path: "{{ install_dir }}/universal_approver.py"
+      register: approver_stat
+
+    - name: Fail if approver not executable
+      ansible.builtin.fail:
+        msg: "universal_approver.py is not executable"
+      when: not approver_stat.stat.executable
+
+    # Final summary
+    - name: Display setup summary
+      ansible.builtin.debug:
+        msg:
+          - "=========================================="
+          - "MCP Server Setup Complete!"
+          - "=========================================="
+          - ""
+          - "Installation directory: {{ install_dir }}"
+          - "Config file: {{ ansible_env.HOME }}/.mcphost.yml"
+          - "Hooks file: {{ mcphost_config_dir }}/hooks.yml"
+          - ""
+          - "Next steps:"
+          - "1. Install Ollama (if not already): curl -fsSL https://ollama.com/install.sh | sh"
+          - "2. Pull model: ollama pull {{ ollama_model }}"
+          - "3. Install mcphost: https://github.com/wong2/mcphost"
+          - "4. Start mcphost: mcphost"
+          - "5. Test with: 'show available roles'"
+          - ""
+          - "Documentation:"
+          - "  - {{ install_dir }}/README.md"
+          - "  - {{ install_dir }}/docs/setup.md"
+          - "  - {{ install_dir }}/docs/usage.md"
+          - "=========================================="
+
+    - name: Check if Ollama model is available
+      ansible.builtin.command: "ollama list"
+      register: ollama_models
+      changed_when: false
+      failed_when: false
+      when: ollama_check.rc == 0
+
+    - name: Suggest pulling Ollama model
+      ansible.builtin.debug:
+        msg:
+          - "Model {{ ollama_model }} not found in Ollama."
+          - "Pull it with: ollama pull {{ ollama_model }}"
+      when:
+        - ollama_check.rc == 0
+        - ollama_models.stdout is defined
+        - ollama_model not in ollama_models.stdout
