@@ -2,10 +2,10 @@
 mcpServers:
   roles:
     type: local
-    command: ["<ABSOLUTE_PATH>/mcp-linux-system-roles/server/server.py"]
+    command: ["<ABSOLUTE_PATH>/server/server.py"]
     allowedTools: ["run_system_role", "get_role_status", "list_available_roles", "get_role_documentation"]
 
 model: "ollama:gpt-oss:20b"
-system-prompt: "<ABSOLUTE_PATH>/mcp-linux-system-roles/system-prompt.md"
+system-prompt: "<ABSOLUTE_PATH>/system-prompt.md"
 temperature: 0.2
 max-tokens: 2048
