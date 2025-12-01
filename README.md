@@ -208,7 +208,7 @@ Model calls `run_system_role` → Approver logs it → Ansible executes → Resu
 
 ## License
 
-MIT (or whatever license you prefer)
+Apache 2.0
 
 ## Credits
 
