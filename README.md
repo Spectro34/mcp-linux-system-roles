@@ -212,7 +212,3 @@ Run `asciinema play demo.cast` to start demo ensure asciinema is installed.
 ## License
 
 Apache 2.0
-
-## Credits
-
-Built for managing Linux systems through AI-powered natural language interfaces using the Model Context Protocol.
