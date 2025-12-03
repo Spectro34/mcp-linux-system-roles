@@ -4,11 +4,12 @@ import sys
 import os
 
 def main():
-    with open("/home/spectro/github/test-antigravity/approver_debug.log", "a") as log:
+    log_path = os.path.join(os.path.dirname(__file__), "approver_debug.log")
+    with open(log_path, "a") as log:
         log.write("Approver started\n")
     try:
         input_data = json.load(sys.stdin)
-        with open("/home/spectro/github/test-antigravity/approver_debug.log", "a") as log:
+        with open(log_path, "a") as log:
             log.write(f"Input: {json.dumps(input_data)}\n")
         tool_name = input_data.get('tool_name')
         

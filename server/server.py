@@ -121,7 +121,9 @@ def list_tools():
     ]
 
 def handle_call_tool(name, arguments):
-    with open("/home/spectro/github/test-antigravity/server_debug.log", "a") as log:
+    # Log relative to the server script location
+    log_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "server_debug.log")
+    with open(log_path, "a") as log:
         log.write(f"Server called: {name} args: {arguments}\n")
     
     if name.endswith("list_available_roles"):
