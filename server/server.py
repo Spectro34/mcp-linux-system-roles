@@ -85,17 +85,6 @@ def list_tools():
             }
         },
         {
-            "name": "get_role_status",
-            "description": "Check if a role is installed/configured (Generic check).",
-            "inputSchema": {
-                "type": "object",
-                "properties": {
-                     "role_name": {"type": "string"}
-                },
-                "required": ["role_name"]
-            }
-        },
-        {
             "name": "list_available_roles",
             "description": "List all available Linux System Roles installed on the system.",
             "inputSchema": {
@@ -168,11 +157,6 @@ def handle_call_tool(name, arguments):
             return {"content": [{"type": "text", "text": "Error: role_name is required"}]}
 
         return {"content": [{"type": "text", "text": json.dumps(run_ansible(role_name, role_vars), indent=2)}]}
-    
-    elif name == "get_role_status":
-        # This is hard to make truly generic without role-specific logic.
-        # For now, we return a placeholder or basic package check if possible.
-        return {"content": [{"type": "text", "text": "Generic status check not fully implemented. Please check system logs or configuration files manually."}]}
     
     raise ValueError(f"Unknown tool: {name}")
 

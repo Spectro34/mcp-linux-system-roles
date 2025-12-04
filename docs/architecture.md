@@ -21,7 +21,6 @@ This document explains each component of the MCP Linux System Roles server and h
 │  • list_available_roles                                         │
 │  • get_role_documentation                                       │
 │  • run_system_role ──► universal_approver.py                    │
-│  • get_role_status                                              │
 └───────────────────────────────┬─────────────────────────────────┘
                                 │
                                 ▼
@@ -45,10 +44,7 @@ This document explains each component of the MCP Linux System Roles server and h
 - Provides 4 tools to the AI model:
   1. `list_available_roles` - Lists all installed SUSE roles
   2. `get_role_documentation` - Reads role README files
-  3. `run_system_role` - Executes Ansible playbooks
-  4. `get_role_status` - Placeholder for status checks
-- Runs Ansible playbooks with user-specified variables
-- Returns execution results to the model
+  3. `run_system_role` - Executes Ansible playbooks with user-specified variables and returns execution results to the model
 
 **Key Functions**:
 ```python
@@ -207,7 +203,6 @@ mcpServers:
     command: ["/path/to/server.py"]  # How to start server
     allowedTools:  # Which tools the model can use
       - run_system_role
-      - get_role_status
       - list_available_roles
       - get_role_documentation
 

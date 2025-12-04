@@ -165,7 +165,6 @@ Model calls `run_system_role` → Approver logs it → Ansible executes → Resu
 | `list_available_roles` | Lists all 17 SUSE Linux System Roles |
 | `get_role_documentation` | Reads role README to learn variables |
 | `run_system_role` | Executes Ansible playbook with specified variables |
-| `get_role_status` | Placeholder for status checks |
 
 ## Available SUSE Roles
 

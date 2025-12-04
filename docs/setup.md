@@ -104,7 +104,7 @@ mcpServers:
   roles:
     type: local
     command: ["/home/YOUR_USERNAME/mcp-linux-system-roles/server/server.py"]
-    allowedTools: ["run_system_role", "get_role_status", "list_available_roles", "get_role_documentation"]
+    allowedTools: ["run_system_role", "list_available_roles", "get_role_documentation"]
 
 model: "ollama:gpt-oss:20b"
 system-prompt: "/home/YOUR_USERNAME/mcp-linux-system-roles/system-prompt.md"
@@ -166,7 +166,7 @@ Verify the path points to the correct location of `universal_approver.py`.
 echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | ~/mcp-linux-system-roles/server/server.py
 ```
 
-**Expected output**: JSON listing 4 tools (list_available_roles, get_role_documentation, run_system_role, get_role_status)
+**Expected output**: JSON listing 3 tools (list_available_roles, get_role_documentation, run_system_role)
 
 #### 5b. Test Approver Manually
 

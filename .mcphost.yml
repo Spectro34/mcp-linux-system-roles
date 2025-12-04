@@ -1,4 +1,4 @@
-# MCP Server - Linux System Roles Configuration (Example)
+# MCPHost Configuration
 mcpServers:
   roles:
     type: local

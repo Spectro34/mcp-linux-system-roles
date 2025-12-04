@@ -1,0 +1,11 @@
+{
+  "name": "system-roles",
+  "version": "1.0.0",
+  "description": "System Roles Chat Interface for MCPHost",
+  "menu": {
+    "system-roles": {
+      "label": "System Roles",
+      "path": "index.html"
+    }
+  }
+}

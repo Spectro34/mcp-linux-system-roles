@@ -19,7 +19,6 @@ The "4 tools" should be:
 - `roles_list_available_roles` (or `roles__list_available_roles`)
 - `roles_get_role_documentation`
 - `roles_run_system_role` (or `roles__run_system_role`)
-- `roles_get_role_status`
 
 ---
 

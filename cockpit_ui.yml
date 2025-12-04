@@ -1,0 +1,83 @@
+---
+# Ansible playbook to configure Cockpit System Roles Chat UI
+# This sets up the cockpit-chat plugin for web-based AI-assisted configuration
+
+- name: Configure Cockpit System Roles Chat UI
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  
+  vars:
+    # Use relative paths - same approach as setup.yml
+    project_dir: "{{ playbook_dir }}"
+    cockpit_plugin_src: "{{ project_dir }}/cockpit-chat"
+    cockpit_plugin_dest: "{{ ansible_env.HOME }}/.local/share/cockpit/system-roles"
+    
+  tasks:
+    - name: Ensure Cockpit is installed
+      package:
+        name: cockpit
+        state: present
+      become: yes
+      
+    - name: Ensure Cockpit is enabled and running
+      systemd:
+        name: cockpit.socket
+        state: started
+        enabled: yes
+      become: yes
+      
+    - name: Create Cockpit user plugins directory
+      file:
+        path: "{{ ansible_env.HOME }}/.local/share/cockpit"
+        state: directory
+        mode: '0755'
+        
+    - name: Remove existing System Roles plugin symlink if present
+      file:
+        path: "{{ cockpit_plugin_dest }}"
+        state: absent
+      
+    - name: Create symlink for System Roles Cockpit plugin
+      file:
+        src: "{{ cockpit_plugin_src }}"
+        dest: "{{ cockpit_plugin_dest }}"
+        state: link
+        
+    - name: Verify plugin files exist
+      stat:
+        path: "{{ cockpit_plugin_src }}/{{ item }}"
+      register: plugin_files
+      failed_when: not plugin_files.stat.exists
+      loop:
+        - manifest.json
+        - index.html
+        - chat.css
+        - chat.js
+        
+    - name: Display Cockpit access information
+      debug:
+        msg:
+          - "=========================================="
+          - "✅ Cockpit System Roles Chat UI Configured!"
+          - "=========================================="
+          - ""
+          - "Access Cockpit at: https://localhost:9090"
+          - "Menu item: 'System Roles'"
+          - ""
+          - "Plugin location: {{ cockpit_plugin_dest }}"
+          - "Source: {{ cockpit_plugin_src }}"
+          - ""
+          - "The plugin uses:"
+          - "  - Config: {{ project_dir }}/.mcphost.yml"
+          - "  - MCP Server: {{ project_dir }}/server/server.py"
+          - "  - System Prompt: {{ project_dir }}/system-prompt.md"
+          - "  - Approval Hook: {{ project_dir }}/universal_approver.py"
+          - ""
+          - "To test:"
+          - "  1. Open https://localhost:9090"
+          - "  2. Click 'System Roles' in the menu"
+          - "  3. Try: 'which roles are available'"
+          - "  4. Try: 'configure aide to check daily at midnight'"
+          - ""
+
