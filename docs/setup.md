@@ -82,7 +82,7 @@ For this guide, we'll assume you copied to `~/mcp-linux-system-roles`.
 
 ```bash
 chmod +x ~/mcp-linux-system-roles/server/server.py
-chmod +x ~/mcp-linux-system-roles/universal_approver.py
+chmod +x ~/mcp-linux-system-roles/approver.py
 ```
 
 ---
@@ -134,7 +134,7 @@ cp ~/mcp-linux-system-roles/.mcphost/hooks.yml ~/.config/mcphost/.mcphost/
 
 #### 4c. Edit hooks.yml
 
-Edit `~/.config/mcphost/.mcphost/hooks.yml` and replace `<ABSOLUTE_PATH>` with the full path to `universal_approver.py`:
+Edit `~/.config/mcphost/.mcphost/hooks.yml` and replace `<ABSOLUTE_PATH>` with the full path to `approver.py`:
 
 ```bash
 # Example: if package is in ~/mcp-linux-system-roles/
@@ -149,7 +149,7 @@ Or manually edit the file to replace `<ABSOLUTE_PATH>` with your actual path.
 cat ~/.config/mcphost/.mcphost/hooks.yml
 ```
 
-Verify the path points to the correct location of `universal_approver.py`.
+Verify the path points to the correct location of `approver.py`.
 
 **Why `~/.config/mcphost/.mcphost/`?**
 - Most reliable global location for hooks
@@ -171,7 +171,7 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | ~/mcp-linux-system-roles
 #### 5b. Test Approver Manually
 
 ```bash
-echo '{"tool_name":"roles__run_system_role","tool_input":"{}"}' | ~/mcp-linux-system-roles/universal_approver.py
+echo '{"tool_name":"roles__run_system_role","tool_input":"{}"}' | ~/mcp-linux-system-roles/approver.py
 ```
 
 **Expected output**: 
@@ -190,7 +190,7 @@ After setup, your files should be:
 
 ~/mcp-linux-system-roles/
 ├── server/server.py                        # MCP server
-├── universal_approver.py                   # Approver hook
+├── approver.py                   # Approver hook
 ├── system-prompt.md                        # Model instructions
 ├── .mcphost/hooks.yml                      # (reference copy)
 └── docs/                                   # Documentation
@@ -236,7 +236,7 @@ ls ~/.config/mcphost/.mcphost/hooks.yml
 
 **Solution 2**: Check approver path in hooks.yml
 ```yaml
-command: "/home/USER/mcp-linux-system-roles/universal_approver.py"  # Must be absolute
+command: "/home/USER/mcp-linux-system-roles/approver.py"  # Must be absolute
 ```
 
 **Solution 3**: Verify matcher names
@@ -277,7 +277,7 @@ If not found, you may need to install it or use a different namespace (fedora, r
 Before first use, verify:
 
 - [ ] `server.py` is executable
-- [ ] `universal_approver.py` is executable
+- [ ] `approver.py` is executable
 - [ ] `~/.mcphost.yml` has correct absolute paths
 - [ ] `~/.config/mcphost/.mcphost/hooks.yml` exists and has correct path
 - [ ] SUSE roles exist at `/usr/share/ansible/collections/.../suse/linux_system_roles/`

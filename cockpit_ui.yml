@@ -72,7 +72,7 @@
           - "  - Config: {{ project_dir }}/.mcphost.yml"
           - "  - MCP Server: {{ project_dir }}/server/server.py"
           - "  - System Prompt: {{ project_dir }}/system-prompt.md"
-          - "  - Approval Hook: {{ project_dir }}/universal_approver.py"
+          - "  - Approval Hook: {{ project_dir }}/approver.py"
           - ""
           - "To test:"
           - "  1. Open https://localhost:9090"

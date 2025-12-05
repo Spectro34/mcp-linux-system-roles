@@ -435,7 +435,7 @@ Model: [Executes both roles]
 **Solution**:
 1. Check `~/.config/mcphost/.mcphost/hooks.yml` exists
 2. Verify paths in hooks.yml are absolute
-3. Test manually: `echo '{"tool_name":"roles__run_system_role","tool_input":"{}"}' | ~/mcp-linux-system-roles/universal_approver.py`
+3. Test manually: `echo '{"tool_name":"roles__run_system_role","tool_input":"{}"}' | ~/mcp-linux-system-roles/approver.py`
 
 ---
 

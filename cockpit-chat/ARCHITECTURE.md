@@ -116,7 +116,7 @@ Message 3:
 
 When AI tries to execute a role:
 1. MCPHost calls the hook
-2. `universal_approver.py` prompts in terminal
+2. `approver.py` prompts in terminal
 3. User must approve in terminal
 4. Only then does execution proceed
 

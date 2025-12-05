@@ -20,7 +20,7 @@ This document explains each component of the MCP Linux System Roles server and h
 │                    MCP Tools (server.py)                         │
 │  • list_available_roles                                         │
 │  • get_role_documentation                                       │
-│  • run_system_role ──► universal_approver.py                    │
+│  • run_system_role ──► approver.py                    │
 └───────────────────────────────┬─────────────────────────────────┘
                                 │
                                 ▼
@@ -67,7 +67,7 @@ def run_ansible(role_name, vars_dict)
 
 ---
 
-### 2. `universal_approver.py`
+### 2. `approver.py`
 
 **Purpose**: Approver hook that logs role execution for auditing.
 
@@ -127,12 +127,12 @@ hooks:
     - matcher: "roles_run_system_role"
       hooks:
         - type: command
-          command: "<ABSOLUTE_PATH>/universal_approver.py"
+          command: "<ABSOLUTE_PATH>/approver.py"
           timeout: 300
     - matcher: "roles__run_system_role"
       hooks:
         - type: command
-          command: "<ABSOLUTE_PATH>/universal_approver.py"
+          command: "<ABSOLUTE_PATH>/approver.py"
           timeout: 300
 ```
 
@@ -245,9 +245,9 @@ max-tokens: 2048  # Response length limit
    ↓
 8. mcphost checks hooks.yml
    - Finds matcher for "roles__run_system_role"
-   - Runs: universal_approver.py
+   - Runs: approver.py
    ↓
-9. universal_approver.py
+9. approver.py
    - Logs to stderr: [Executing role aide...]
    - Returns: {"decision": "approve"}
    ↓
@@ -269,7 +269,7 @@ max-tokens: 2048  # Response length limit
 | File | Production Location | Purpose |
 |------|-------------------|---------|
 | `server/server.py` | Anywhere (specify in .mcphost.yml) | MCP server process |
-| `universal_approver.py` | Anywhere (specify in hooks.yml) | Pre-execution logging |
+| `approver.py` | Anywhere (specify in hooks.yml) | Pre-execution logging |
 | `hooks.yml` | **`~/.config/mcphost/.mcphost/hooks.yml`** (must create manually) | Hook configuration |
 | `system-prompt.md` | Anywhere (specify in .mcphost.yml) | Model instructions |
 | `.mcphost.yml` | `~/.mcphost.yml` or project directory | Main configuration |

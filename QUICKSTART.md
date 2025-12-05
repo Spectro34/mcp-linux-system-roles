@@ -63,7 +63,7 @@ ansible-playbook -i localhost, -c local setup.yml -e "install_dir=/opt/mcp-linux
 ```
 ~/mcp-linux-system-roles/
 ├── server/server.py
-├── universal_approver.py
+├── approver.py
 ├── system-prompt.md
 ├── docs/
 │   ├── architecture.md

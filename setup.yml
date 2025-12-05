@@ -112,10 +112,10 @@
         dest: "{{ install_dir }}/server/server.py"
         mode: '0755'
 
-    - name: Copy universal_approver.py
+    - name: Copy approver.py
       ansible.builtin.copy:
-        src: "{{ package_dir }}/universal_approver.py"
-        dest: "{{ install_dir }}/universal_approver.py"
+        src: "{{ package_dir }}/approver.py"
+        dest: "{{ install_dir }}/approver.py"
         mode: '0755'
 
     - name: Copy system-prompt.md
@@ -164,15 +164,15 @@
 
     - name: Create hooks.yml from template
       ansible.builtin.template:
-        src: "{{ package_dir }}/.mcphost/hooks.yml"
+        src: "{{ package_dir }}/.mcphost/hooks.yml.template"
         dest: "{{ mcphost_config_dir }}/hooks.yml"
         mode: '0644'
 
-    - name: Process hooks.yml template
+    - name: Process hooks.yml template - Replace approver path
       ansible.builtin.replace:
         path: "{{ mcphost_config_dir }}/hooks.yml"
-        regexp: '<ABSOLUTE_PATH>'
-        replace: "{{ install_dir }}"
+        regexp: '<APPROVER_PATH>'
+        replace: "{{ install_dir }}/approver.py"
 
     # Verify installation
     - name: Verify server.py is executable
@@ -185,14 +185,14 @@
         msg: "server.py is not executable"
       when: not server_stat.stat.executable
 
-    - name: Verify universal_approver.py is executable
+    - name: Verify approver.py is executable
       ansible.builtin.stat:
-        path: "{{ install_dir }}/universal_approver.py"
+        path: "{{ install_dir }}/approver.py"
       register: approver_stat
 
     - name: Fail if approver not executable
       ansible.builtin.fail:
-        msg: "universal_approver.py is not executable"
+        msg: "approver.py is not executable"
       when: not approver_stat.stat.executable
 
     # Final summary

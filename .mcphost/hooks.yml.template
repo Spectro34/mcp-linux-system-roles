@@ -1,0 +1,22 @@
+# MCPHost Hooks Configuration Template
+# This file will be copied to ~/.config/mcphost/.mcphost/hooks.yml during setup
+# Placeholders will be replaced by the Ansible playbook
+
+hooks:
+  PreToolUse:
+    # Match run_system_role with various naming conventions
+    - matcher: "roles_run_system_role"
+      hooks:
+        - type: command
+          command: "<APPROVER_PATH>"
+          timeout: 300
+    - matcher: "roles__run_system_role"
+      hooks:
+        - type: command
+          command: "<APPROVER_PATH>"
+          timeout: 300
+    - matcher: "linux-roles__run_system_role"
+      hooks:
+        - type: command
+          command: "<APPROVER_PATH>"
+          timeout: 300

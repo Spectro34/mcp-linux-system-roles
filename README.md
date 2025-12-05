@@ -22,7 +22,7 @@ MCP Tools:
   - get_role_documentation → Reads role README
   - run_system_role → Executes Ansible playbook
     ↓
-universal_approver.py (logs and auto-approves)
+approver.py (logs and auto-approves)
     ↓
 server.py (runs ansible-playbook)
     ↓
@@ -73,12 +73,12 @@ ollama pull gpt-oss:20b
 3. **Update hooks.yml**:
    - In `.mcphost/hooks.yml`, update the approver path:
    ```yaml
-   command: "/home/user/mcp-linux-system-roles/universal_approver.py"
+   command: "/home/user/mcp-linux-system-roles/approver.py"
    ```
 
 4. **Make scripts executable**:
    ```bash
-   chmod +x server/server.py universal_approver.py
+   chmod +x server/server.py approver.py
    ```
 
 5. **Copy hooks to mcphost config**:
@@ -131,7 +131,7 @@ mcp-linux-system-roles/
 │   └── server.py              # MCP server (handles tools)
 ├── .mcphost/
 │   └── hooks.yml              # Template (copy to global config)
-├── universal_approver.py       # Approver (logs execution)
+├── approver.py       # Approver (logs execution)
 ├── system-prompt.md           # Model instructions
 ├── .mcphost.yml.example       # Example config
 ├── docs/
@@ -197,7 +197,7 @@ Run `asciinema play demo.cast` to start demo ensure asciinema is installed.
 
 ### Approver not running
 - Verify hooks.yml path is correct
-- Check that universal_approver.py is executable
+- Check that approver.py is executable
 - Ensure tool name matches in hooks.yml (both `roles_run_system_role` and `roles__run_system_role`)
 
 ### Role not found
