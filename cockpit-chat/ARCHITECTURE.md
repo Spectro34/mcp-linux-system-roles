@@ -172,3 +172,4 @@ Browser → cockpit.spawn(['mcphost', '-p', '...', '--quiet'])
 - Configuration read-only
 - Independent execution
 
+

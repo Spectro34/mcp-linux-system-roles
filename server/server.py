@@ -43,26 +43,9 @@ def run_ansible(role_name, vars_dict):
         result = subprocess.run(cmd, env=env, capture_output=True, text=True, check=True)
         return {"status": "success", "stdout": result.stdout}
     except subprocess.CalledProcessError as e:
-        # Generic Error Handling
-        response = {"status": "error", "stderr": e.stderr, "stdout": e.stdout, "rc": e.returncode}
-
-        # SPECIAL HANDLING FOR AIDE
-        # AIDE uses specific return codes for "changes found" (success in a check context)
-        if "aide" in role_name:
-             # Check for integrity violation (RC 7 or specific output)
-             if '"rc": 7' in e.stdout or "AIDE found differences" in e.stdout:
-                 response["status"] = "integrity_violation"
-                 response["message"] = "AIDE found differences between the database and the filesystem."
-                 return response
-             
-             # Check for update success (RC 4 or specific output)
-             if '"rc": 4' in e.stdout or "New AIDE database written" in e.stdout:
-                 response["status"] = "updated"
-                 response["message"] = "AIDE database updated successfully."
-                 return response
-
+        # Generic error handling for all roles
         logger.error(f"Ansible failed: {e.stderr}")
-        return response
+        return {"status": "error", "stderr": e.stderr, "stdout": e.stdout, "rc": e.returncode}
 
 def list_tools():
     return [
