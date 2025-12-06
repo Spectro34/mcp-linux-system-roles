@@ -9,6 +9,37 @@ import logging
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 logger = logging.getLogger("mcp-server-linux-roles")
 
+# SUSE roles path
+ROLES_PATH = "/usr/share/ansible/collections/ansible_collections/suse/linux_system_roles/roles"
+
+
+def discover_roles():
+    """Discover available SUSE Linux System Roles by scanning the roles directory."""
+    roles = {}
+    if not os.path.exists(ROLES_PATH):
+        return roles
+    
+    for role_name in os.listdir(ROLES_PATH):
+        role_path = os.path.join(ROLES_PATH, role_name)
+        # Skip hidden files and non-directories
+        if role_name.startswith('.') or not os.path.isdir(role_path):
+            continue
+        
+        # Validate role by checking for tasks/main.yml (indicates a valid Ansible role)
+        tasks_yml = os.path.join(role_path, "tasks", "main.yml")
+        if not os.path.exists(tasks_yml):
+            continue
+        
+        full_name = f"suse.linux_system_roles.{role_name}"
+        roles[full_name] = {
+            "name": role_name,
+            "full_name": full_name,
+            "path": role_path,
+            "readme": os.path.join(role_path, "README.md"),
+        }
+    
+    return roles
+
 def run_ansible(role_name, vars_dict):
     """Runs the specified ansible role with the given variables."""
     
@@ -99,14 +130,14 @@ def handle_call_tool(name, arguments):
     
     if name.endswith("list_available_roles"):
         try:
-            # List only SUSE roles from the system-wide collection
-            suse_path = "/usr/share/ansible/collections/ansible_collections/suse/linux_system_roles/roles"
-            if os.path.exists(suse_path):
-                roles = os.listdir(suse_path)
-                roles_list = "\n".join([f"  - suse.linux_system_roles.{role}" for role in sorted(roles) if not role.startswith('.')])
-                return {"content": [{"type": "text", "text": f"Available SUSE Linux System Roles:\n{roles_list}"}]}
-            else:
-                return {"content": [{"type": "text", "text": "SUSE Linux System Roles collection not found at /usr/share/ansible/collections/"}]}
+            roles = discover_roles()
+            if not roles:
+                return {"content": [{"type": "text", "text": f"No roles found at {ROLES_PATH}. Ensure SUSE Linux System Roles collection is installed."}]}
+            
+            output = "Available SUSE Linux System Roles:\n"
+            for full_name in sorted(roles.keys()):
+                output += f"  - {full_name}\n"
+            return {"content": [{"type": "text", "text": output}]}
         except Exception as e:
             return {"content": [{"type": "text", "text": f"Error listing roles: {str(e)}"}]}
     
@@ -115,13 +146,24 @@ def handle_call_tool(name, arguments):
         if not role_name:
             return {"content": [{"type": "text", "text": "Error: role_name is required"}]}
         
-        # Read README.md for the specified role
-        readme_path = f"/usr/share/ansible/collections/ansible_collections/suse/linux_system_roles/roles/{role_name}/README.md"
-        
-        if not os.path.exists(readme_path):
-            return {"content": [{"type": "text", "text": f"Documentation not found for role '{role_name}'. Use list_available_roles to see available roles."}]}
-        
         try:
+            roles = discover_roles()
+            
+            # Try to find the role by exact match or short name
+            role_info = None
+            for full_name, info in roles.items():
+                if info["name"] == role_name or full_name == role_name:
+                    role_info = info
+                    break
+            
+            if not role_info:
+                available = ", ".join([info["name"] for info in roles.values()])
+                return {"content": [{"type": "text", "text": f"Role '{role_name}' not found. Available roles: {available}. Use list_available_roles to see all roles."}]}
+            
+            readme_path = role_info["readme"]
+            if not os.path.exists(readme_path):
+                return {"content": [{"type": "text", "text": f"No documentation found for role '{role_name}' at {readme_path}"}]}
+            
             with open(readme_path, 'r') as f:
                 content = f.read()
             # Return first 8000 chars to avoid token limits
